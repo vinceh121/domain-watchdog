@@ -258,19 +258,7 @@ class WatchListController extends AbstractController
             'token' => $watchList->getToken(),
         ]);
 
-        $this->em->beginTransaction();
-
-        /** @var WatchList $oldWatchlist */
-        $oldWatchlist = $this->em->getReference(WatchList::class, $watchList->getToken());
-        $this->em->lock($oldWatchlist, LockMode::PESSIMISTIC_WRITE);
-
-        $this->em->remove($oldWatchlist);
         $this->em->flush();
-
-        $this->em->persist($watchList);
-        $this->em->flush();
-
-        $this->em->commit();
 
         return $watchList;
     }

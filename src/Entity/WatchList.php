@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Provider\WatchListProvider;
 use App\Repository\WatchListRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -79,9 +82,10 @@ use Symfony\Component\Uid\Uuid;
         new Put(
             routeName: 'watchlist_update',
             normalizationContext: ['groups' => 'watchlist:item'],
-            denormalizationContext: ['groups' => ['watchlist:create', 'watchlist:token']],
+            denormalizationContext: ['groups' => ['watchlist:create']],
             security: 'object.user == user',
-            name: 'update'
+            name: 'update',
+            allowCreate: false
         ),
         new Delete(
             security: 'object.user == user'
@@ -96,6 +100,7 @@ class WatchList
     #[ORM\Id]
     #[ORM\Column(type: 'uuid')]
     #[Groups(['watchlist:item', 'watchlist:list', 'watchlist:token'])]
+    #[ApiProperty(identifier: true)]
     private string $token;
     /**
      * @var Collection<int, Domain>
