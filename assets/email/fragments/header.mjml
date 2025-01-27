@@ -1,0 +1,7 @@
+<mj-section background-color="{{ email_color|default('') }}">
+    <mj-column>
+        <mj-navbar base-url="{{ base_url|default('/') }}">
+            <mj-navbar-link href="/" color="white">Domain Watchdog</mj-navbar-link>
+        </mj-navbar>
+    </mj-column>
+</mj-section>

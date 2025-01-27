@@ -1,0 +1,36 @@
+<mjml>
+    <mj-include path="fragments/head.mjml"/>
+    <mj-body>
+        <mj-include path="fragments/header.mjml"/>
+        <mj-section>
+            <mj-column>
+                <mj-text>
+                    Hello,
+                    <br/>
+                    Please confirm your email address by clicking the following link:
+                </mj-text>
+            </mj-column>
+        </mj-section>
+        <mj-section>
+            <mj-column>
+                <mj-button href="{{ signedUrl|raw }}">
+                    Confirm my Email
+                </mj-button>
+            </mj-column>
+        </mj-section>
+        <mj-section>
+            <mj-column>
+                <mj-text>
+                    <p>
+                        This link will expire in {{ expiresAt }}.
+                    </p>
+                    <p>
+                        Thank you for your understanding,<br/>
+                        Sincerely,
+                    </p>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+        <mj-include path="fragments/footer.mjml"/>
+    </mj-body>
+</mjml>

@@ -1,0 +1,7 @@
+<mj-section>
+    <mj-column>
+        <mj-text>
+            &copy; Domain Watchdog {{'now' | date('Y')}}
+        </mj-text>
+    </mj-column>
+</mj-section>

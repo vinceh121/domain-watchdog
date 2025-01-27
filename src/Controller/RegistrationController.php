@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
@@ -25,15 +27,37 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RegistrationController extends AbstractController
 {
     public function __construct(
-        private readonly EmailVerifier $emailVerifier,
-        private readonly string $mailerSenderEmail,
-        private readonly string $mailerSenderName,
-        private readonly RateLimiterFactory $userRegisterLimiter,
+        private readonly EmailVerifier          $emailVerifier,
+        private readonly string                 $mailerSenderEmail,
+        private readonly string                 $mailerSenderName,
+        private readonly RateLimiterFactory     $userRegisterLimiter,
         private readonly EntityManagerInterface $em,
-        private readonly SerializerInterface $serializer,
-        private readonly LoggerInterface $logger,
-        private readonly KernelInterface $kernel,
+        private readonly SerializerInterface    $serializer,
+        private readonly LoggerInterface        $logger,
+        private readonly KernelInterface        $kernel, private readonly MailerInterface $mailer,
     ) {
+    }
+
+    #[Route('/api/testemail')]
+    public function testEmail(Security $security, MailerInterface $mailer): Response
+    {
+        /** @var User $user */
+        $user = $security->getUser();
+
+        $email = (new TemplatedEmail())
+            ->from(new Address($this->mailerSenderEmail, $this->mailerSenderName))
+            ->to($user->getEmail())
+            ->locale('en')
+            ->subject('Please Confirm your Email')
+            ->context([
+                'signedUrl' => 'https://example.com',
+                'expiresAt' => 'test',
+            ])
+            ->htmlTemplate('emails-new/confirmation_email.html');
+
+        $this->mailer->send($email);
+
+        return new Response('ok');
     }
 
     /**
@@ -84,7 +108,7 @@ class RegistrationController extends AbstractController
                     ->to($user->getEmail())
                     ->locale('en')
                     ->subject('Please Confirm your Email')
-                    ->htmlTemplate('emails/success/confirmation_email.html.twig')
+                    ->htmlTemplate('emails-new/confirmation_email.html')
             );
 
             $signedUrl = (string) $email->getContext()['signedUrl'];

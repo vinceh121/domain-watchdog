@@ -1,0 +1,3 @@
+<mj-head>
+    <mj-title>{{title|default('Domain Watchdog - Notification')}}</mj-title>
+</mj-head>
